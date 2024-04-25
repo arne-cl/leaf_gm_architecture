@@ -293,7 +293,7 @@ def trait_pairs_correlation (df_agg,traita1, trait2):
 
 
 def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_of_interest,
-                                               enseble_size,min_rows=50):
+                                               ensemble_size,min_rows=50):
     """ 
     To get the repeated cross-validation predictability scores and Gini importance of the traits for the PFT and combination of interest.
     
@@ -305,7 +305,7 @@ def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_o
         The PFT of interest, including one or a group of existing names in the column 'plant_functional_type' of df.
     combination_of_interest: list
         The combination of interest, including one or a group of existing traits (column names) in the df.
-    enseble_size: integer
+    ensemble_size: integer
         The number of executions for i) splitting data to train and test sets and ii) training the model with a different
         random state.
     min_rows: integer
@@ -318,11 +318,11 @@ def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_o
     """   
     PFT_df=make_PFT_df(df_agg,PFT_of_interest)
     combination_df=make_combination_df(PFT_df,combination_of_interest)
-    train_res=RF_with_spilit(combination_df,enseble_size,min_rows)
+    train_res=RF_with_spilit(combination_df,ensemble_size,min_rows)
     return train_res
 
 
-def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,enseble_size,min_rows=50):    
+def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,ensemble_size,min_rows=50):    
     """ 
     To get the repeated cross-validation predictability scores and Gini importance of the traits for the PFT of interest
     and all the possible combinations of traits.
@@ -335,7 +335,7 @@ def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,enseble_size,min_
         The PFT of interest, including one or a group of existing names in the column 'plant_functional_type' of df.
     traits_list: list
         One or a group of existing traits (column names) in the df to be analyzed.
-    enseble_size: integer
+    ensemble_size: integer
         The number of executions for i) splitting data to train and test sets and ii) training the model with a different
         random state.
     min_rows: integer
@@ -355,14 +355,14 @@ def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,enseble_size,min_
         combination_df=make_combination_df(PFT_df,list(traits))
         if combination_df.shape[0] < min_rows: continue 
         n_models += 1
-        train_res=RF_with_spilit(combination_df,enseble_size,min_rows)   
+        train_res=RF_with_spilit(combination_df,ensemble_size,min_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [combination_df.shape[0]] + [train_res[key] for key in headers[2:]]
 
     return table_df
 
 
 def cross_prediction_global_PFT_with_combination_of_interest(df_agg,PFT_of_interest,combination_of_interest,
-                                            enseble_size=5,minimum_train_rows=40,minimum_test_rows=10):    
+                                            ensemble_size=5,minimum_train_rows=40,minimum_test_rows=10):    
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between the (non-overlapping)
     global set and PFT of interest, for the given combination of traits.
@@ -375,7 +375,7 @@ def cross_prediction_global_PFT_with_combination_of_interest(df_agg,PFT_of_inter
         The PFT of interest, including one or a group of existing names in the column 'plant_functional_type' of df.
     combination_of_interest: list
         The combination of interest, including one or a group of existing traits (column names) in the df.
-    enseble_size: integer
+    ensemble_size: integer
         The number of executions for training the model with a different random state.
     minimum_train_rows: integer
         The minimum number of data sets (rows) that the available data for the PFT and combination of interest
@@ -395,13 +395,13 @@ def cross_prediction_global_PFT_with_combination_of_interest(df_agg,PFT_of_inter
     
     combination_df_train=make_combination_df(PFT_df_train,combination_of_interest)
     combination_df_test=make_combination_df(PFT_df_test,combination_of_interest)
-    train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,enseble_size,
+    train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
                                           minimum_train_rows,minimum_test_rows)   
     return train_res
 
 
 def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
-                                            enseble_size=150,minimum_train_rows=40,minimum_test_rows=10):
+                                            ensemble_size=150,minimum_train_rows=40,minimum_test_rows=10):
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between the (non-overlapping)
     global set and PFT of interest, for all the possible combinations of traits.
@@ -412,7 +412,7 @@ def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
         The aggregated DataFrame containing the data set provided by Knauer et al. 2022.
     PFT_of_interest : list
         The PFT of interest, including one or a group of existing names in the column 'plant_functional_type' of df.
-    enseble_size: integer
+    ensemble_size: integer
         The number of executions for training the model with a different random state.
     minimum_train_rows: integer
         The minimum number of data sets (rows) that the available data for the PFT and combination of interest
@@ -439,7 +439,7 @@ def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
         if combination_df_train.shape[0]<minimum_train_rows or combination_df_test.shape[0]<minimum_test_rows:  continue
         if combination_df_train.shape[0]<combination_df_test.shape[0]:  continue
         n_models += 1
-        train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,enseble_size,
+        train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
                                               minimum_train_rows,minimum_test_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [[combination_df_train.shape[0],combination_df_test.shape[0]]]+ [train_res[key] for key in headers[2:]]
 
@@ -501,7 +501,7 @@ def available_PFT_pairs(df_agg,PFT_dict,traits_list,minimum_train_rows=40,minimu
 
 
 def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_test,combination_of_interest,
-                                            enseble_size=50,minimum_train_rows=40,minimum_test_rows=10):    
+                                            ensemble_size=50,minimum_train_rows=40,minimum_test_rows=10):    
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between two PFTs of interest,
     for the given combination of traits.
@@ -516,7 +516,7 @@ def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_t
         The PFT of interest for tasting the model, including one or a group of existing names in the column 'plant_functional_type' of df.
     combination_of_interest: list
         The combination of interest, including one or a group of existing traits (column names) in the df.
-    enseble_size: integer
+    ensemble_size: integer
         The number of executions for training the model with a different random state.
     minimum_train_rows: integer
         The minimum number of data sets (rows) that the available data for the PFT and combination of interest
@@ -536,12 +536,12 @@ def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_t
     
     combination_df_train=make_combination_df(PFT_df_train,combination_of_interest)
     combination_df_test=make_combination_df(PFT_df_test,combination_of_interest)
-    train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,enseble_size,
+    train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
                                           minimum_train_rows,minimum_test_rows)    
     return train_res
 ###############################################################################
 def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
-                                            enseble_size=150,minimum_train_rows=40,minimum_test_rows=10):
+                                            ensemble_size=150,minimum_train_rows=40,minimum_test_rows=10):
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between two PFTs of
     interest in all the possible combinations of traits.
@@ -554,7 +554,7 @@ def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
         The PFT of interest for training the models, including one or a group of existing names in the column 'plant_functional_type' of df.
     PFT_test : list
         The PFT of interest for tasting the models, including one or a group of existing names in the column 'plant_functional_type' of df.
-    enseble_size: integer
+    ensemble_size: integer
         The number of executions for training the model with a different random state.
     minimum_train_rows: integer
         The minimum number of data sets (rows) that the available data for the PFT and combination of interest
@@ -581,7 +581,7 @@ def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
         if combination_df_train.shape[0]<minimum_train_rows or combination_df_test.shape[0]<minimum_test_rows:  continue
         if combination_df_train.shape[0]<combination_df_test.shape[0]:  continue
         n_models += 1
-        train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,enseble_size,
+        train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
                                               minimum_train_rows,minimum_test_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [[combination_df_train.shape[0],combination_df_test.shape[0]]]+ [train_res[key] for key in headers[2:]]
 
