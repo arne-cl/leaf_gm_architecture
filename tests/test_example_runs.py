@@ -22,28 +22,6 @@ def test_example_run1():
     aggregated_df = pd.read_parquet('gm_dataset_Knauer_et_al_2022_aggregated.parquet')
     combination_of_traits = ['T_cw','Sc','T_leaf', 'D_leaf']
 
-    PFTs = {'semi_deciduous_angiosperms':['semi-deciduous angiosperms'],
-            'deciduous_gymnosperms':['deciduous gymnosperms'],
-            'woody_evergreen_angiosperms':['evergreen angiosperms'],
-            'C3_perennial_herbaceous':['C3 perennial herbaceous'],
-            'ferns':['ferns'], 
-            'C3_annual_herbaceous':['C3 annual herbaceous'],
-            'C4_annual_herbaceous':['C4 annual herbaceous'],
-            'C4_perennial_herbaceous':['C4 perennial herbaceous'],
-            'evergreen_gymnosperms':['evergreen gymnosperms'],
-            'CAM_plants':['CAM plants'],
-            'mosses':['mosses'],
-            'woody_deciduous_angiosperms':['deciduous angiosperms'],
-            'fern_allies':['fern allies'],
-            'C3_herbaceous':['C3 perennial herbaceous','C3 annual herbaceous'],
-            'C3_C4_herbaceous':['C4 annual herbaceous','C4 perennial herbaceous','C3 perennial herbaceous','C3 annual herbaceous'],
-            'woody_evergreens':['evergreen angiosperms','evergreen gymnosperms'],
-            'woody_angiosperms':['evergreen angiosperms','deciduous angiosperms','semi-deciduous angiosperms'],
-            'extended_ferns':['ferns', 'fern allies'],
-            'global_set':['C3 perennial herbaceous','evergreen angiosperms','ferns','mosses','semi-deciduous angiosperms',
-      'evergreen gymnosperms','C4 annual herbaceous','fern allies','deciduous gymnosperms',
-      'deciduous angiosperms','CAM plants','C3 annual herbaceous','C4 perennial herbaceous']}
-
     expected_results = {
         'R2': 0.6074139550478569,
         'R2_err': 0.023959111708946965,
@@ -54,7 +32,7 @@ def test_example_run1():
         'importances': np.array([0.62323259, 0.15238046, 0.13257167, 0.09181528])
     }
 
-    actual_results = gm.CV_with_PFT_and_combination_of_interest(aggregated_df,PFTs['global_set'],combination_of_traits,ensemble_size=50,min_rows=50)
+    actual_results = gm.CV_with_PFT_and_combination_of_interest(aggregated_df,gm.PFTs['global_set'],combination_of_traits,ensemble_size=50,min_rows=50)
     check_dicts_almost_equal(expected_results, actual_results)
 
 

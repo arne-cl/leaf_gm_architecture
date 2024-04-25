@@ -8,6 +8,37 @@ from sklearn.metrics import r2_score
 from scipy import stats
 
 
+PFTs = {
+    'semi_deciduous_angiosperms': ['semi-deciduous angiosperms'],
+    'deciduous_gymnosperms': ['deciduous gymnosperms'],
+    'woody_evergreen_angiosperms': ['evergreen angiosperms'],
+    'C3_perennial_herbaceous': ['C3 perennial herbaceous'],
+    'ferns': ['ferns'], 
+    'C3_annual_herbaceous': ['C3 annual herbaceous'],
+    'C4_annual_herbaceous': ['C4 annual herbaceous'],
+    'C4_perennial_herbaceous': ['C4 perennial herbaceous'],
+    'evergreen_gymnosperms': ['evergreen gymnosperms'],
+    'CAM_plants': ['CAM plants'],
+    'mosses': ['mosses'],
+    'woody_deciduous_angiosperms': ['deciduous angiosperms'],
+    'fern_allies': ['fern allies'],
+    'C3_herbaceous':
+        ['C3 perennial herbaceous','C3 annual herbaceous'],
+    'C3_C4_herbaceous':
+        ['C4 annual herbaceous','C4 perennial herbaceous','C3 perennial herbaceous','C3 annual herbaceous'],
+    'woody_evergreens':
+        ['evergreen angiosperms','evergreen gymnosperms'],
+    'woody_angiosperms':
+        ['evergreen angiosperms','deciduous angiosperms','semi-deciduous angiosperms'],
+    'extended_ferns':
+        ['ferns', 'fern allies'],
+    'global_set':
+        ['C3 perennial herbaceous','evergreen angiosperms','ferns','mosses','semi-deciduous angiosperms',
+        'evergreen gymnosperms','C4 annual herbaceous','fern allies','deciduous gymnosperms',
+        'deciduous angiosperms','CAM plants','C3 annual herbaceous','C4 perennial herbaceous']
+}
+
+
 def data_aggregation(original_df):
     """ 
     This function reads the gm dataset from Knauer et al. 2002 and aggregates it such that:
@@ -537,7 +568,8 @@ def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_t
     train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
                                           minimum_train_rows,minimum_test_rows)    
     return train_res
-###############################################################################
+
+
 def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
                                             ensemble_size=150,minimum_train_rows=40,minimum_test_rows=10):
     """ 
