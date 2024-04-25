@@ -1,13 +1,13 @@
 import pandas as pd
 import numpy as np
 from itertools import combinations
-####
+
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
 from scipy import stats
-#################################### 
-####################################################################################
+
+
 def data_aggregation(original_df):
     """ 
     This function reads the gm dataset from Knauer et al. 2002 and aggregates it such that:
@@ -34,8 +34,7 @@ def data_aggregation(original_df):
     df=original_df.copy(deep=True)
     original_columns_order = df.columns.tolist()
     numeric_columns = (df.select_dtypes(include=['number'])).columns.tolist()
-    ###########################
-    #############
+
     def custom_agg(series):
         if series.name in numeric_columns:
             return series.mean() 
@@ -44,7 +43,7 @@ def data_aggregation(original_df):
             return series.str.cat(sep=', ')
         else:
             return series.iloc[0] 
-    ###########################
+
     grouping_cols = ['refkey','species','cultivar_variety','population_year','growth_environment']
     str_cols = ['method','variant','method_reference']
     
@@ -52,9 +51,9 @@ def data_aggregation(original_df):
     aggregated_df = aggregated_df[original_columns_order] 
     
     aggregated_df.to_excel('gm_dataset_Knauer_et_al_2022_aggregated.xlsx', index=False)
-    ##########################
     return aggregated_df
-###############################################################################
+
+
 def make_all_possible_combinations(t_list):
     """ 
     Constructing all the possible combinations of the given traits.
@@ -74,7 +73,8 @@ def make_all_possible_combinations(t_list):
     for n in range(len(t_list)):
         ls_combinations += list(combinations(t_list, n+1))
     return(ls_combinations)
-###############################################################################
+
+
 def RF_with_spilit(comb_df,ensemble,minimum_data):
     """ 
     Training an ensemble of random forest models by randomly splitting the data to 70% train and 30% test sets.
@@ -132,7 +132,8 @@ def RF_with_spilit(comb_df,ensemble,minimum_data):
         res={'R2': np.mean(r2s),'R2_err': stats.sem(r2s),'R2_adj': np.mean(r2_adjs),'R2_adj_err': stats.sem(r2_adjs) ,
              'r': np.mean(corrs),'r_err': stats.sem(corrs),'importances': imps_mean/np.sum(imps_mean)}
     return res  
-###############################################################################
+
+
 def RF_with_train_and_test_data(comb_df_train,comb_df_test,ensemble,minimum_train_data,minimum_test_data):
     """ 
     Training an ensemble of random forest models with differnet random states for the given fixed traing and test data.
@@ -196,7 +197,8 @@ def RF_with_train_and_test_data(comb_df_train,comb_df_test,ensemble,minimum_trai
         res={'R2': np.mean(r2s),'R2_err': stats.sem(r2s),'R2_adj': np.mean(r2_adjs),'R2_adj_err': stats.sem(r2_adjs) ,
              'r': np.mean(corrs),'r_err': stats.sem(corrs),'importances': imps_mean/np.sum(imps_mean)}
     return res  
-###############################################################################
+
+
 def make_PFT_df(df,PFT):
     """ 
     Make the date set for the given PFT by removing the data points for all the other PFTs.
@@ -216,7 +218,8 @@ def make_PFT_df(df,PFT):
     """
     new_df = df[df['plant_functional_type'].isin(PFT)].copy(deep=True)
     return new_df
-###############################################################################
+
+
 def make_non_overlapping_PFT_df(df,PFT):
     """ 
     Make the date set which contains data points of all the PFTs except the given PFT.
@@ -236,7 +239,8 @@ def make_non_overlapping_PFT_df(df,PFT):
     """
     new_df = df[~df['plant_functional_type'].isin(PFT)].copy(deep=True)
     return new_df
-###############################################################################
+
+
 def make_combination_df(df,t_combination):
     """ 
     Make the date set for the given combination of traits by removing the data points for all the other traits.
@@ -257,7 +261,8 @@ def make_combination_df(df,t_combination):
     new_df = df.loc[:,['gm']+t_combination].copy(deep=True)
     new_df = new_df.dropna(how='any')
     return new_df
-###############################################################################
+
+
 def trait_pairs_correlation (df_agg,traita1, trait2):
     """ 
     Get the correlation between two traits based on all the available data for this pair in the data set.    
@@ -285,9 +290,8 @@ def trait_pairs_correlation (df_agg,traita1, trait2):
     pearson_r=correlation[0]
     p_value = correlation[1]
     return pearson_r,p_value
-    
-    
-###############################################################################
+
+
 def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_of_interest,
                                                enseble_size,min_rows=50):
     """ 
@@ -311,15 +315,14 @@ def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_o
     -------
     res : dict 
         The resulting predictability scores and importance of the given traits.
-    """
-    
+    """   
     PFT_df=make_PFT_df(df_agg,PFT_of_interest)
     combination_df=make_combination_df(PFT_df,combination_of_interest)
     train_res=RF_with_spilit(combination_df,enseble_size,min_rows)
     return train_res
-###############################################################################
-def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,enseble_size,min_rows=50):
-    
+
+
+def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,enseble_size,min_rows=50):    
     """ 
     To get the repeated cross-validation predictability scores and Gini importance of the traits for the PFT of interest
     and all the possible combinations of traits.
@@ -343,7 +346,6 @@ def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,enseble_size,min_
     res : Pandas DataFrame
         The DataFrame (table) of the resulting predictability scores and Gini importance of the traits for all available combinations.
     """
-    
     PFT_df=make_PFT_df(df_agg,PFT_of_interest)
     trait_combinations=make_all_possible_combinations(traits_list)
     headers=['Traits','N','R2','R2_err','R2_adj','R2_adj_err','r','r_err','importances']
@@ -355,13 +357,12 @@ def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,enseble_size,min_
         n_models += 1
         train_res=RF_with_spilit(combination_df,enseble_size,min_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [combination_df.shape[0]] + [train_res[key] for key in headers[2:]]
-    ########
+
     return table_df
-###############################################################################
-###############################################################################
+
+
 def cross_prediction_global_PFT_with_combination_of_interest(df_agg,PFT_of_interest,combination_of_interest,
-                                            enseble_size=5,minimum_train_rows=40,minimum_test_rows=10):
-    
+                                            enseble_size=5,minimum_train_rows=40,minimum_test_rows=10):    
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between the (non-overlapping)
     global set and PFT of interest, for the given combination of traits.
@@ -397,10 +398,10 @@ def cross_prediction_global_PFT_with_combination_of_interest(df_agg,PFT_of_inter
     train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,enseble_size,
                                           minimum_train_rows,minimum_test_rows)   
     return train_res
-###############################################################################
+
+
 def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
                                             enseble_size=150,minimum_train_rows=40,minimum_test_rows=10):
-    
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between the (non-overlapping)
     global set and PFT of interest, for all the possible combinations of traits.
@@ -425,7 +426,6 @@ def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
     res : Pandas DataFrame
         The DataFrame (table) of the resulting predictability scores and Gini importance of the traits for all available combinations.
     """
-    
     PFT_df_train = make_non_overlapping_PFT_df(df_agg,PFT_of_interest)
     PFT_df_test = make_PFT_df(df_agg,PFT_of_interest)
     
@@ -442,10 +442,10 @@ def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
         train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,enseble_size,
                                               minimum_train_rows,minimum_test_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [[combination_df_train.shape[0],combination_df_test.shape[0]]]+ [train_res[key] for key in headers[2:]]
-    ########
+
     return table_df
-###############################################################################
-###############################################################################
+
+
 def available_PFT_pairs(df_agg,PFT_dict,traits_list,minimum_train_rows=40,minimum_test_rows=10):
     """
     To find all possible pairs of PFTs that do not overlap and include at least one combination with 
@@ -498,12 +498,10 @@ def available_PFT_pairs(df_agg,PFT_dict,traits_list,minimum_train_rows=40,minimu
                     n_models += 1
                 if n_models>0: available_pairs[pf1,pf2]=n_models
     return available_pairs
-    
-###############################################################################
-###############################################################################
+
+
 def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_test,combination_of_interest,
-                                            enseble_size=50,minimum_train_rows=40,minimum_test_rows=10):
-    
+                                            enseble_size=50,minimum_train_rows=40,minimum_test_rows=10):    
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between two PFTs of interest,
     for the given combination of traits.
@@ -544,7 +542,6 @@ def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_t
 ###############################################################################
 def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
                                             enseble_size=150,minimum_train_rows=40,minimum_test_rows=10):
-    
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between two PFTs of
     interest in all the possible combinations of traits.
@@ -571,7 +568,6 @@ def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
     res : Pandas DataFrame
         The DataFrame (table) of the resulting predictability scores and Gini importance of the traits for all available combinations.
     """
-    
     PFT_df_train = make_PFT_df(df_agg,PFT_train)
     PFT_df_test  = make_PFT_df(df_agg,PFT_test)
     
@@ -588,10 +584,10 @@ def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
         train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,enseble_size,
                                               minimum_train_rows,minimum_test_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [[combination_df_train.shape[0],combination_df_test.shape[0]]]+ [train_res[key] for key in headers[2:]]
-    ########
+
     return table_df
-###############################################################################
-###############################################################################
+
+
 def total_importances(df_of_results):
     """
     To compute the total importance measures of all the traits contributing to the trained models of the given PFT.
@@ -614,16 +610,16 @@ def total_importances(df_of_results):
     Res_DF=df_of_results.copy(deep=True) 
     Res_DF = Res_DF.sort_values(by='R2_adj', ascending=False)
     Res_DF = Res_DF[Res_DF['R2_adj'] > 0.0]
-    ##############################
+
     traits0 = Res_DF['Traits'].tolist()
     flattened_list = [item for sublist in traits0 for item in sublist]
     unique_traits = list(set(flattened_list))
     for t in unique_traits:  
         Res_DF [t] = [float('nan')] * Res_DF.shape[0] 
-    ##########
+
     imps_table_1 = Res_DF[unique_traits+['R2_adj']].copy(deep=True)
     imps_table_2 = Res_DF[unique_traits+['R2_adj']].copy(deep=True)
-    ##############################
+
     for i in range(Res_DF.shape[0]):
         row_index=imps_table_1.index[i]
         trits_of_row=Res_DF.loc[row_index,'Traits']
@@ -632,12 +628,11 @@ def total_importances(df_of_results):
         for j in range(len(trits_of_row)):
             imps_table_1.loc[row_index,trits_of_row[j]] = imps_of_row[j] * r2_adj_of_row 
             imps_table_2.loc[row_index,trits_of_row[j]] = r2_adj_of_row
-    ##############################
+
     IMP_G = imps_table_1[unique_traits].mean(skipna=True).to_frame().T
     IMP_G = IMP_G.div(IMP_G.sum(axis=1), axis=0)
-    #########
+
     IMP_C = imps_table_2[unique_traits].mean(skipna=True).to_frame().T
     IMP_C = IMP_C.div(IMP_C.sum(axis=1), axis=0)
-    ##############################
-    return IMP_G, IMP_C    
-###############################################################################
+
+    return IMP_G, IMP_C
