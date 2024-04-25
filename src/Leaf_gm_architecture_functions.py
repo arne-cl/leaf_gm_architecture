@@ -49,8 +49,6 @@ def data_aggregation(original_df):
     
     aggregated_df = df.groupby(grouping_cols,dropna=False).agg(custom_agg).reset_index()
     aggregated_df = aggregated_df[original_columns_order] 
-    
-    aggregated_df.to_excel('gm_dataset_Knauer_et_al_2022_aggregated.xlsx', index=False)
     return aggregated_df
 
 
