@@ -104,7 +104,7 @@ def make_all_possible_combinations(t_list):
     return(ls_combinations)
 
 
-def RF_with_spilit(comb_df,ensemble,minimum_data):
+def RF_with_split(comb_df, ensemble, minimum_data):
     """ 
     Training an ensemble of random forest models by randomly splitting the data to 70% train and 30% test sets.
     
@@ -129,37 +129,36 @@ def RF_with_spilit(comb_df,ensemble,minimum_data):
             r: The average Pearson correlation of determination over different models.
             r_err: The standard error for the average Pearson correlation of determination over different models.
             importances : The list of the importance of the traits in the model.
-    
     """
     if comb_df.shape[0]<minimum_data: 
         print('The number of data points is less than miniumum!')
         res={'R2': np.nan,'R2_err': np.nan,'R2_adj': np.nan,'R2_adj_err': np.nan,
              'r': np.nan,'r_err': np.nan,'importances': np.nan}
     else:
-        X= np.array(comb_df.values)[:,1:] 
-        y= np.array(comb_df.values)[:,0] 
-        ###
-        r2s=[]
-        r2_adjs=[]
-        corrs=[]
-        imps=[]
+        X = np.array(comb_df.values)[:,1:] 
+        y = np.array(comb_df.values)[:,0] 
+
+        r2s = []
+        r2_adjs = []
+        corrs = []
+        imps = []
         for _ in range(ensemble):
             model = RandomForestRegressor(n_estimators=100, random_state=None)
             X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.3, random_state=None)
             model.fit(X_train, y_train)
             y_pred = model .predict(X_test)
-            r2=r2_score(y_test, y_pred)
+            r2 = r2_score(y_test, y_pred)
             r2s.append(r2)
-            ####
-            r2_adj= 1 - (((1 - r2) * (X_test.shape[0] - 1)) / (X_test.shape[0] - X_test.shape[1] - 1))
+
+            r2_adj = 1 - (((1 - r2) * (X_test.shape[0] - 1)) / (X_test.shape[0] - X_test.shape[1] - 1))
             r2_adjs.append(r2_adj)
-            ####
+
             corrs.append(stats.pearsonr(y_test, y_pred)[0])
-            ####
+
             imps.append(np.array(model.feature_importances_))
-        imps_mean=np.mean(np.array(imps),axis=0)
-        res={'R2': np.mean(r2s),'R2_err': stats.sem(r2s),'R2_adj': np.mean(r2_adjs),'R2_adj_err': stats.sem(r2_adjs) ,
-             'r': np.mean(corrs),'r_err': stats.sem(corrs),'importances': imps_mean/np.sum(imps_mean)}
+        imps_mean = np.mean(np.array(imps),axis=0)
+        res = {'R2': np.mean(r2s),'R2_err': stats.sem(r2s),'R2_adj': np.mean(r2_adjs),'R2_adj_err': stats.sem(r2_adjs) ,
+               'r': np.mean(corrs),'r_err': stats.sem(corrs),'importances': imps_mean/np.sum(imps_mean)}
     return res  
 
 
@@ -345,9 +344,9 @@ def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_o
     res : dict 
         The resulting predictability scores and importance of the given traits.
     """   
-    PFT_df=make_PFT_df(df_agg,PFT_of_interest)
-    combination_df=make_combination_df(PFT_df,combination_of_interest)
-    train_res=RF_with_spilit(combination_df,ensemble_size,min_rows)
+    PFT_df = make_PFT_df(df_agg, PFT_of_interest)
+    combination_df = make_combination_df(PFT_df, combination_of_interest)
+    train_res = RF_with_split(combination_df, ensemble_size, min_rows)
     return train_res
 
 
@@ -375,16 +374,17 @@ def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,ensemble_size,min
     res : Pandas DataFrame
         The DataFrame (table) of the resulting predictability scores and Gini importance of the traits for all available combinations.
     """
-    PFT_df=make_PFT_df(df_agg,PFT_of_interest)
-    trait_combinations=make_all_possible_combinations(traits_list)
+    PFT_df = make_PFT_df(df_agg, PFT_of_interest)
+    trait_combinations = make_all_possible_combinations(traits_list)
     headers=['Traits','N','R2','R2_err','R2_adj','R2_adj_err','r','r_err','importances']
     table_df = pd.DataFrame(columns=headers)
-    n_models=0
+    n_models = 0
+
     for i, traits in enumerate(trait_combinations):
-        combination_df=make_combination_df(PFT_df,list(traits))
+        combination_df = make_combination_df(PFT_df, list(traits))
         if combination_df.shape[0] < min_rows: continue 
         n_models += 1
-        train_res=RF_with_spilit(combination_df,ensemble_size,min_rows)   
+        train_res = RF_with_split(combination_df, ensemble_size, min_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [combination_df.shape[0]] + [train_res[key] for key in headers[2:]]
 
     return table_df

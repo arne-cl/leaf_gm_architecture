@@ -66,6 +66,8 @@ def main():
     if st.button('Perform Analysis'):
         results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=50, min_rows=50)
 
+        # ~ import pudb; pudb.set_trace()
+
         predictability_scores_df, importances_df = dict_to_tables(results)
         # show predictability scores table
         st.subheader('Predictability scores')
