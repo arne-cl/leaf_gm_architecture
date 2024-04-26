@@ -90,7 +90,7 @@ PFTs = {'semi_deciduous_angiosperms':['semi-deciduous angiosperms'],
   'evergreen gymnosperms','C4 annual herbaceous','fern allies','deciduous gymnosperms',
   'deciduous angiosperms','CAM plants','C3 annual herbaceous','C4 perennial herbaceous']}
 
-results=gm.CV_with_PFT_and_combination_of_interest(aggregated_df,PFTs['global_set'],combination_of_traits,enseble_size=50,min_rows=50)
+results=gm.CV_with_PFT_and_combination_of_interest(aggregated_df,PFTs['global_set'],combination_of_traits,ensemble_size=50,min_rows=50)
 
 """
 The ensemble number must be increased to get more accurate results.
@@ -109,7 +109,7 @@ global_df = pd.read_excel('gm_dataset_Knauer_et_al_2022.xlsx', sheet_name='data'
 aggregated_df = gm.data_aggregation(global_df)
 list_of_traits = ['LMA','T_mesophyll','fias_mesophyll','T_cw','T_cyt','T_chloroplast','Sm','Sc','T_leaf', 'D_leaf']
 
-table_of_results=gm.cross_prediction_global_PFT(aggregated_df,['ferns'],list_of_traits,enseble_size=5,
+table_of_results=gm.cross_prediction_global_PFT(aggregated_df,['ferns'],list_of_traits,ensemble_size=5,
                                              minimum_train_rows=40,minimum_test_rows=10)
 """
 The ensemble number must be increased to get more accurate results.
