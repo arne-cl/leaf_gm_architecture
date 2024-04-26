@@ -31,7 +31,11 @@ def dict_to_tables(results):
     # create predictability scores DataFrame by excluding 'importances'
     predictability_scores_df = pd.DataFrame({k: [v] for k, v in results.items() if k != 'importances'})
 
-    importances_df = pd.DataFrame({'Value': results['importances']})
+    if results['importances'] is np.nan:
+        importances_df = pd.DataFrame({'Value': results['importances']}, index=[0])
+    else:
+        importances_df = pd.DataFrame({'Value': results['importances']})
+
     return predictability_scores_df, importances_df
 
 
