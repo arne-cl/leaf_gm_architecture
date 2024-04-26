@@ -130,8 +130,8 @@ def RF_with_split(comb_df, ensemble, minimum_data):
             r_err: The standard error for the average Pearson correlation of determination over different models.
             importances : The list of the importance of the traits in the model.
     """
-    if comb_df.shape[0]<minimum_data: 
-        print('The number of data points is less than miniumum!')
+    if comb_df.shape[0] < minimum_data:
+        print(f'The number of data points ({comb_df.shape[0]}) is less than the minimum required ({minimum_data})!')
         res={'R2': np.nan,'R2_err': np.nan,'R2_adj': np.nan,'R2_adj_err': np.nan,
              'r': np.nan,'r_err': np.nan,'importances': np.nan}
     else:
