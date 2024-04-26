@@ -35,42 +35,45 @@ def dict_to_tables(results):
     return predictability_scores_df, importances_df
 
 
+def main():
+    # initialize session state for aggregated data
+    if 'aggregated_df' not in st.session_state:
+        st.session_state['aggregated_df'] = load_data()
 
-# initialize session state for aggregated data
-if 'aggregated_df' not in st.session_state:
-    st.session_state['aggregated_df'] = load_data()
+    # Sidebar for parameter selection
+    st.sidebar.header('Parameters')
+    selected_traits = st.sidebar.multiselect(
+        'Select Traits',
+        options=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
+        default=['T_cw','Sc','T_leaf', 'D_leaf'])
 
-# Sidebar for parameter selection
-st.sidebar.header('Parameters')
-selected_traits = st.sidebar.multiselect(
-    'Select Traits',
-    options=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
-    default=['T_cw','Sc','T_leaf', 'D_leaf'])
+    pft_group_options = list(gm.PFTs.keys())
+    selected_pft_group = st.sidebar.selectbox(
+        'Select PFT Group',
+        options=pft_group_options,
+        index=pft_group_options.index('global_set'))
 
-pft_group_options = list(gm.PFTs.keys())
-selected_pft_group = st.sidebar.selectbox(
-    'Select PFT Group',
-    options=pft_group_options,
-    index=pft_group_options.index('global_set'))
+    # Display the selected parameters
+    st.write('Selected Traits:', ", ".join(selected_traits))
 
-# Display the selected parameters
-st.write('Selected Traits:', ", ".join(selected_traits))
+    pft_list = gm.PFTs[selected_pft_group]
+    pft_description = ""
+    if len(pft_list) > 1:
+        pft_description = f"(which contains these PFTs: {', '.join(gm.PFTs[selected_pft_group])})"
+    st.write('Selected PFT group:', selected_pft_group, pft_description)
 
-pft_list = gm.PFTs[selected_pft_group]
-pft_description = ""
-if len(pft_list) > 1:
-    pft_description = f"(which contains these PFTs: {', '.join(gm.PFTs[selected_pft_group])})"
-st.write('Selected PFT group:', selected_pft_group, pft_description)
+    # Perform analysis
+    if st.button('Perform Analysis'):
+        results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=50, min_rows=50)
 
-# Perform analysis
-if st.button('Perform Analysis'):
-    results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=50, min_rows=50)
+        predictability_scores_df, importances_df = dict_to_tables(results)
+        # show predictability scores table
+        st.subheader('Predictability scores')
+        st.dataframe(predictability_scores_df)
 
-    predictability_scores_df, importances_df = dict_to_tables(results)
-    # show predictability scores table
-    st.subheader('Predictability scores')
-    st.dataframe(predictability_scores_df)
+        # show importances table
+        st.subheader('Gini importances')
+        st.dataframe(importances_df)
 
-    # show importances table
-    st.subheader('Gini importances')
-    st.dataframe(importances_df)
+if __name__ == '__main__':
+    main()
