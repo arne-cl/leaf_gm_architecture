@@ -44,46 +44,78 @@ def main():
     if 'aggregated_df' not in st.session_state:
         st.session_state['aggregated_df'] = load_data()
 
-    # Sidebar for parameter selection
-    st.sidebar.header('Parameters')
-    selected_traits = st.sidebar.multiselect(
-        'Select Traits',
-        options=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
-        default=['T_cw','Sc','T_leaf', 'D_leaf'])
+    # create tabs for each example usa case
+    tab1, tab2 = st.tabs(["Predictability & Gini Importances", "Cross Prediction & Total Importances"])
 
-    pft_group_options = list(gm.PFTs.keys())
-    selected_pft_group = st.sidebar.selectbox(
-        'Select PFT Group',
-        options=pft_group_options,
-        index=pft_group_options.index('global_set'))
+    with tab1:
+        st.header("Predictability Scores and Gini Importances")
+        
+        # sidebar for parameter selection
+        st.sidebar.header('Parameters')
+        selected_traits = st.sidebar.multiselect(
+            'Select Traits',
+            options=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
+            default=['T_cw','Sc','T_leaf', 'D_leaf'])
 
-    # Display the selected parameters
-    st.write('Selected Traits:', ", ".join(selected_traits))
+        pft_group_options = list(gm.PFTs.keys())
+        selected_pft_group = st.sidebar.selectbox(
+            'Select PFT Group',
+            options=pft_group_options,
+            index=pft_group_options.index('global_set'))
 
-    pft_list = gm.PFTs[selected_pft_group]
-    pft_description = ""
-    if len(pft_list) > 1:
-        pft_description = f"(which contains these PFTs: {', '.join(gm.PFTs[selected_pft_group])})"
-    st.write('Selected PFT group:', selected_pft_group, pft_description)
+        # Display the selected parameters
+        st.write('Selected Traits:', ", ".join(selected_traits))
 
-    # Perform analysis
-    if st.button('Perform Analysis'):
-        results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=50, min_rows=50)
+        pft_list = gm.PFTs[selected_pft_group]
+        pft_description = ""
+        if len(pft_list) > 1:
+            pft_description = f"(which contains these PFTs: {', '.join(gm.PFTs[selected_pft_group])})"
+        st.write('Selected PFT group:', selected_pft_group, pft_description)
 
-        # TODO FIXME: propagate "error message" from RF_with_split to front end
-        #   print(f'The number of data points ({comb_df.shape[0]}) is less than the minimum required ({minimum_data})!')
-        #
-        # RF_with_split is called in two functions, so I have to test them
-        # before I can raise a ValueError instead of printing.
+        # Perform analysis
+        if st.button('Perform Analysis'):
+            results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=50, min_rows=50)
 
-        predictability_scores_df, importances_df = dict_to_tables(results)
-        # show predictability scores table
-        st.subheader('Predictability scores')
-        st.dataframe(predictability_scores_df)
+            # TODO FIXME: propagate "error message" from RF_with_split to front end
+            #   print(f'The number of data points ({comb_df.shape[0]}) is less than the minimum required ({minimum_data})!')
+            #
+            # RF_with_split is called in two functions, so I have to test them
+            # before I can raise a ValueError instead of printing.
 
-        # show importances table
-        st.subheader('Gini importances')
-        st.dataframe(importances_df)
+            predictability_scores_df, importances_df = dict_to_tables(results)
+            # show predictability scores table
+            st.subheader('Predictability scores')
+            st.dataframe(predictability_scores_df)
+
+            # show importances table
+            st.subheader('Gini importances')
+            st.dataframe(importances_df)
+
+    with tab2:  # Cross Prediction & Total Importances
+        st.header("Cross Prediction and Total Importances")
+        selected_traits = st.multiselect('Select traits', 
+                                         ['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
+                                         default=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'])
+        ensemble_size = st.number_input('Ensemble Size (Tab 2)', min_value=1, value=5, step=1)
+        min_train_rows = st.number_input('Minimum Train Rows', min_value=1, value=40, step=1)
+        min_test_rows = st.number_input('Minimum Test Rows', min_value=1, value=10, step=1)
+
+        if st.button('Calculate Cross Prediction'):
+            table_of_results = gm.cross_prediction_global_PFT(
+                st.session_state['aggregated_df'], ['ferns'], selected_traits, 
+                ensemble_size=ensemble_size, minimum_train_rows=min_train_rows, 
+                minimum_test_rows=min_test_rows)
+
+            if table_of_results.shape[0] > 0:
+                st.write("Trained models:", table_of_results.shape[0])
+                st.write(table_of_results)
+                average_imps_g, average_values_c = gm.total_importances(table_of_results)
+                st.write("The IMP_G of the contributing traits in the trained models:", average_imps_g)
+                st.write("The IMP_C of the contributing traits in the trained models:", average_values_c)
+            else:
+                st.write("There are no trained models because of data availability!")
+
+
 
 if __name__ == '__main__':
     main()
