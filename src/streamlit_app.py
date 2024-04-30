@@ -58,6 +58,9 @@ def main():
                 options=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
                 default=['T_cw', 'Sc', 'T_leaf', 'D_leaf'])
 
+            ensemble_size = st.number_input('Ensemble Size', min_value=1, value=50, step=1)
+            min_rows = st.number_input('Minimum Rows', min_value=1, value=50, step=1)
+
             pft_group_options = list(gm.PFTs.keys())
             selected_pft_group = st.selectbox(
                 'Select PFT Group',
@@ -74,7 +77,7 @@ def main():
                 pft_description = f"(which contains these PFTs: {', '.join(pft_list)})"
             st.write('Selected PFT group:', selected_pft_group, pft_description)
 
-            results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=50, min_rows=50)
+            results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=ensemble_size, min_rows=min_rows)
             predictability_scores_df, importances_df = dict_to_tables(results)
 
             # show predictability scores table
@@ -91,7 +94,7 @@ def main():
         selected_traits = st.multiselect('Select traits', 
                                          ['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
                                          default=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'])
-        ensemble_size = st.number_input('Ensemble Size (Tab 2)', min_value=1, value=5, step=1)
+        ensemble_size = st.number_input('Ensemble Size', min_value=1, value=5, step=1)
         min_train_rows = st.number_input('Minimum Train Rows', min_value=1, value=40, step=1)
         min_test_rows = st.number_input('Minimum Test Rows', min_value=1, value=10, step=1)
 
