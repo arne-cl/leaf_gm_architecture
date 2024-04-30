@@ -40,6 +40,8 @@ def dict_to_tables(results):
 
 
 def main():
+    st.title('leaf_gm_architecture')
+
     # initialize session state for aggregated data
     if 'aggregated_df' not in st.session_state:
         st.session_state['aggregated_df'] = load_data()
