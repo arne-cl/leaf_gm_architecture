@@ -26,7 +26,9 @@ The data set contains more than 100 structural, anatomical, biochemical, and phy
 list_of_traits = ['LMA','T_mesophyll','fias_mesophyll','T_cw','T_cyt','T_chloroplast','Sm','Sc','T_leaf', 'D_leaf']
 ```
 
-The data set also was categorized into major plant functional types (PFTs) in the column 'plant_functional_type'. In our analyses, we used 13 PFTs from this column and five groups of them and a global set including all of the used PFTs. We identify each group or individual PFT by a list containing the names of the PFTs as follows:
+The data set also was categorized into major plant functional types (PFTs) in the column 'plant_functional_type'.
+In our analyses, we used 13 PFTs from this column and five groups of them and a global set including all of the used PFTs.
+We identify each group or individual PFT by a list containing the names of the PFTs as follows:
 
 ```
 PFTs = {'semi_deciduous_angiosperms':['semi-deciduous angiosperms'],
@@ -51,6 +53,7 @@ PFTs = {'semi_deciduous_angiosperms':['semi-deciduous angiosperms'],
   'evergreen gymnosperms','C4 annual herbaceous','fern allies','deciduous gymnosperms',
   'deciduous angiosperms','CAM plants','C3 annual herbaceous','C4 perennial herbaceous']}
 ```
+
 where the keys are arbitrary names for each group, and the values are the defined list for each PFT or group required in the functions.
 
 Having the trait(s) and PFT(s) of interest in the mentioned format, all the results of the paper can be reproduced by using the appropriate function from the file "Leaf_gm_architecture_functions.py". 
@@ -68,29 +71,8 @@ global_df = pd.read_excel('gm_dataset_Knauer_et_al_2022.xlsx', sheet_name='data'
 aggregated_df = gm.data_aggregation(global_df)
 combination_of_traits = ['T_cw','Sc','T_leaf', 'D_leaf']
 
-PFTs = {'semi_deciduous_angiosperms':['semi-deciduous angiosperms'],
-        'deciduous_gymnosperms':['deciduous gymnosperms'],
-        'woody_evergreen_angiosperms':['evergreen angiosperms'],
-        'C3_perennial_herbaceous':['C3 perennial herbaceous'],
-        'ferns':['ferns'], 
-        'C3_annual_herbaceous':['C3 annual herbaceous'],
-        'C4_annual_herbaceous':['C4 annual herbaceous'],
-        'C4_perennial_herbaceous':['C4 perennial herbaceous'],
-        'evergreen_gymnosperms':['evergreen gymnosperms'],
-        'CAM_plants':['CAM plants'],
-        'mosses':['mosses'],
-        'woody_deciduous_angiosperms':['deciduous angiosperms'],
-        'fern_allies':['fern allies'],
-        'C3_herbaceous':['C3 perennial herbaceous','C3 annual herbaceous'],
-        'C3_C4_herbaceous':['C4 annual herbaceous','C4 perennial herbaceous','C3 perennial herbaceous','C3 annual herbaceous'],
-        'woody_evergreens':['evergreen angiosperms','evergreen gymnosperms'],
-        'woody_angiosperms':['evergreen angiosperms','deciduous angiosperms','semi-deciduous angiosperms'],
-        'extended_ferns':['ferns', 'fern allies'],
-        'global_set':['C3 perennial herbaceous','evergreen angiosperms','ferns','mosses','semi-deciduous angiosperms',
-  'evergreen gymnosperms','C4 annual herbaceous','fern allies','deciduous gymnosperms',
-  'deciduous angiosperms','CAM plants','C3 annual herbaceous','C4 perennial herbaceous']}
-
-results=gm.CV_with_PFT_and_combination_of_interest(aggregated_df,PFTs['global_set'],combination_of_traits,ensemble_size=50,min_rows=50)
+results = gm.CV_with_PFT_and_combination_of_interest(
+    aggregated_df, gm.PFTs['global_set'], combination_of_traits, ensemble_size=50, min_rows=50)
 
 """
 The ensemble number must be increased to get more accurate results.
