@@ -20,7 +20,7 @@ def check_dicts_almost_equal(expected_dict, actual_dict, atol=1e-1):
 def test_example_run1():
     """Check that the first example from the README still works as expected."""
     aggregated_df = pd.read_parquet('gm_dataset_Knauer_et_al_2022_aggregated.parquet')
-    combination_of_traits = ['T_cw','Sc','T_leaf', 'D_leaf']
+    traits = ['T_cw','Sc','T_leaf', 'D_leaf']
 
     expected_results = {
         'R2': 0.6074139550478569,
@@ -32,23 +32,27 @@ def test_example_run1():
         'importances': np.array([0.62323259, 0.15238046, 0.13257167, 0.09181528])
     }
 
-    actual_results = gm.CV_with_PFT_and_combination_of_interest(aggregated_df,gm.PFTs['global_set'],combination_of_traits,ensemble_size=50,min_rows=50)
+    actual_results = gm.CV_with_PFT_and_combination_of_interest(
+        aggregated_df,
+        gm.PFTs['global_set'],
+        traits,
+        ensemble_size=50,
+        min_rows=50)
     check_dicts_almost_equal(expected_results, actual_results)
 
 
 def test_example_run2():
     aggregated_df = pd.read_parquet('gm_dataset_Knauer_et_al_2022_aggregated.parquet')
-    list_of_traits = ['LMA','T_mesophyll','fias_mesophyll','T_cw','T_cyt','T_chloroplast','Sm','Sc','T_leaf', 'D_leaf']
+    traits = ['LMA','T_mesophyll','fias_mesophyll','T_cw','T_cyt','T_chloroplast','Sm','Sc','T_leaf', 'D_leaf']
     table_of_results = gm.cross_prediction_global_PFT(
         aggregated_df,
         ['ferns'],
-        list_of_traits,
+        traits,
         ensemble_size=5,
         minimum_train_rows=40,
         minimum_test_rows=10
     )
 
-    # ~ import pudb; pudb.set_trace()
     assert table_of_results.shape == (55, 9)  # 55 trained models
 
     average_imps_g, average_values_c = gm.total_importances(table_of_results) 
@@ -61,7 +65,6 @@ def test_example_run2():
         'T_cw': {0: 0.3704522732926987},
         'Sc': {0: 0.4363225583099329}
     }
-
     actual_average_imps_g = average_imps_g.to_dict()
     check_dicts_almost_equal(expected_average_imps_g, actual_average_imps_g)
 
