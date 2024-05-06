@@ -46,11 +46,14 @@ def main():
     if 'aggregated_df' not in st.session_state:
         st.session_state['aggregated_df'] = load_data()
 
-    # create tabs for each example usa case
-    tab1, tab2 = st.tabs(["Predictability & Gini Importances", "Cross Prediction & Total Importances"])
+    # create tabs for each example use case
+    tab_name_cross_val = "Cross Validation"
+    tab_name_cross_pred_pft_pft = "Cross Prediction: PFT-PFT"
+    tab_name_cross_pred_global_pft = "Cross Prediction: global-PFT"
+    tab_cross_val, tab_cross_pred_pft_pft, tab_cross_pred_global_pft = st.tabs([tab_name_cross_val, tab_name_cross_pred_pft_pft, tab_name_cross_pred_global_pft])
 
-    with tab1:
-        st.header("Predictability Scores and Gini Importances")
+    with tab_cross_val:
+        st.header(tab_name_cross_val)
         
         with st.form(key='predictability_form'):
             selected_traits = st.multiselect(
@@ -88,9 +91,8 @@ def main():
             st.subheader('Gini importances')
             st.dataframe(importances_df)
 
-
-    with tab2:  # Cross Prediction & Total Importances
-        st.header("Cross Prediction and Total Importances")
+    with tab_cross_pred_pft_pft:
+        st.header(tab_name_cross_pred_pft_pft)
         selected_traits = st.multiselect('Select traits', 
                                          ['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
                                          default=['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'])
@@ -98,10 +100,13 @@ def main():
         min_train_rows = st.number_input('Minimum Train Rows', min_value=1, value=40, step=1)
         min_test_rows = st.number_input('Minimum Test Rows', min_value=1, value=10, step=1)
 
-        if st.button('Calculate Cross Prediction'):
+        if st.button('Calculate Cross Prediction: global-PFT'):
             table_of_results = gm.cross_prediction_global_PFT(
-                st.session_state['aggregated_df'], ['ferns'], selected_traits, 
-                ensemble_size=ensemble_size, minimum_train_rows=min_train_rows, 
+                df_agg=st.session_state['aggregated_df'],
+                PFT_of_interest=['ferns'],
+                traits_list=selected_traits, 
+                ensemble_size=ensemble_size,
+                minimum_train_rows=min_train_rows, 
                 minimum_test_rows=min_test_rows)
 
             if table_of_results.shape[0] > 0:
@@ -113,7 +118,45 @@ def main():
             else:
                 st.write("There are no trained models because of data availability!")
 
+        # TODO: call this function as well
+        # cross_prediction_PFT_PFT_with_combination_of_interest
+        if st.button('Calculate Cross Prediction: global-PFT with combination of interest'):
+            table_of_results = gm.cross_prediction_PFT_PFT_with_combination_of_interest(
+                df_agg=st.session_state['aggregated_df'],
+                PFT_train=['ferns'], # TODO: fix these values
+                PFT_test=['ferns'], # TODO: fix these values
+                combination_of_interest=selected_traits, 
+                ensemble_size=ensemble_size,
+                minimum_train_rows=min_train_rows, 
+                minimum_test_rows=min_test_rows)
+
+            if table_of_results.shape[0] > 0:
+                st.write("Trained models:", table_of_results.shape[0])
+                st.write(table_of_results)
+                average_imps_g, average_values_c = gm.total_importances(table_of_results)
+                st.write("The IMP_G of the contributing traits in the trained models:", average_imps_g)
+                st.write("The IMP_C of the contributing traits in the trained models:", average_values_c)
+            else:
+                st.write("There are no trained models because of data availability!")
+
+    with tab_cross_pred_global_pft:
+        st.header(tab_cross_pred_global_pft)
+
+        # TODO: call this function as well
+        # cross_prediction_global_PFT_with_combination_of_interest
+        st.write("FIXME: This tab wasn't implemented, yet!")
+
+    # ~ cross_prediction_global_PFT_with_combination_of_interest(
+        # ~ df_agg,PFT_of_interest,
+        # ~ combination_of_interest, # different
+        # ~ # these params are the same, but the ensemble_size value is different
+        # ~ ensemble_size=5,  minimum_train_rows=40,minimum_test_rows=10)
 
 
 if __name__ == '__main__':
     main()
+
+# TODO: implement these, but fix the ordering/matching first
+# second tab should only contain global-PFT, third tab only PFT-PFT
+# cross_prediction_PFT_PFT_with_combination_of_interest # add to tab2; name: cross prediction PFT-PFT
+# cross_prediction_global_PFT_with_combination_of_interest # new tab3; name: cross prediction global-PFT
