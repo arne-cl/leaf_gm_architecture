@@ -1,23 +1,18 @@
 # leaf_gm_architecture
+
 This file contains the instructions for using the shared Python functions to reproduce the results presented in the Rahimi-Majd et al. paper.
 
-To run the functions, first, the Excell file of the dataset of Knauer et al. 2002 must be downloaded from the link: https://doi.org/10.6084/m9.figshare.19681410.v1 
-A copy of the used version of the data set in our analyses has been included in the files (gm_dataset_Knauer_et_al_2022.xlsx). 
+To run the functions, first clone this repo and change into the directory.
+Here you can run `pip install .` to install the code as a library.
+We recommended to install the software in a virtual environment,
+e.g. [using Python's venv module](https://realpython.com/python-virtual-environments-a-primer/)
+or [using conda](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html).
+
+A copy of the dataset (Knauer et al. 2002, https://doi.org/10.6084/m9.figshare.19681410.v1 )
+has been included in the files (gm_dataset_Knauer_et_al_2022.xlsx). 
 
 All the codes were written in Python and tested on version 3.11.3. 
-
-The required packages and the tested version of them are as follows:
-
-pandas 1.5.3
-
-numpy 1.24.3
-
-sklearn 1.2.2
-
-scipy 1.10.1
-
-itertools
-
+The required packages are listed in the `pyproject.toml` file.
 
 The data set contains more than 100 structural, anatomical, biochemical, and physiological traits, each provided in a separate column. In the paper, we used ten anatomical and structural traits as follows:
 

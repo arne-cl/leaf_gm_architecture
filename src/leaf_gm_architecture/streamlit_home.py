@@ -30,7 +30,12 @@ if 'aggregated_df' not in st.session_state:
 
 if selected == PageNames.ABOUT.value:
     st.title('leaf_gm_architecture')
-    st.subheader(f"This is a demo for Milad's paper.")
+    st.write(f"""
+    This is a demo for the paper [Rahimi-Majd et al. (2024). Nonlinear models based on leaf architecture traits explain the variability of mesophyll conductance across plant species](https://doi.org/10.22541/au.171169724.40618321/v1) (PREPRINT).
+
+    The scientific code is available [here](https://github.com/MRahimiMajd/leaf_gm_architecture).
+    The code for the web app is [also available](https://github.com/arne-cl/leaf_gm_architecture).
+    """)
 
 if selected == PageNames.CROSSVAL.value:
     streamlit_crossval.app()
