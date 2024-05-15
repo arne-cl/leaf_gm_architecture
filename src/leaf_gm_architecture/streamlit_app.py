@@ -77,7 +77,7 @@ def main():
                 pft_description = f"(which contains these PFTs: {', '.join(pft_list)})"
             st.write('Selected PFT group:', selected_pft_group, pft_description)
 
-            results = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=ensemble_size, min_rows=min_rows)
+            results, model = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=ensemble_size, min_rows=min_rows)
             predictability_scores_df, importances_df = dict_to_tables(results)
 
             # show predictability scores table

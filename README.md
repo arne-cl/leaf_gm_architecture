@@ -71,7 +71,7 @@ global_df = pd.read_excel('gm_dataset_Knauer_et_al_2022.xlsx', sheet_name='data'
 aggregated_df = gm.data_aggregation(global_df)
 combination_of_traits = ['T_cw','Sc','T_leaf', 'D_leaf']
 
-results = gm.CV_with_PFT_and_combination_of_interest(
+results, model = gm.CV_with_PFT_and_combination_of_interest(
     aggregated_df, gm.PFTs['global_set'], combination_of_traits, ensemble_size=50, min_rows=50)
 
 """

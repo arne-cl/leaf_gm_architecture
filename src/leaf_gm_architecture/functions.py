@@ -129,6 +129,7 @@ def RF_with_split(comb_df, ensemble, minimum_data):
             r: The average Pearson correlation of determination over different models.
             r_err: The standard error for the average Pearson correlation of determination over different models.
             importances : The list of the importance of the traits in the model.
+    model : sklearn.ensemble.RandomForestRegressor
     """
     if comb_df.shape[0] < minimum_data:
         print(f'The number of data points ({comb_df.shape[0]}) is less than the minimum required ({minimum_data})!')
@@ -159,7 +160,7 @@ def RF_with_split(comb_df, ensemble, minimum_data):
         imps_mean = np.mean(np.array(imps),axis=0)
         res = {'R2': np.mean(r2s),'R2_err': stats.sem(r2s),'R2_adj': np.mean(r2_adjs),'R2_adj_err': stats.sem(r2_adjs) ,
                'r': np.mean(corrs),'r_err': stats.sem(corrs),'importances': imps_mean/np.sum(imps_mean)}
-    return res  
+    return res, model 
 
 
 def RF_with_train_and_test_data(comb_df_train,comb_df_test,ensemble,minimum_train_data,minimum_test_data):
@@ -192,7 +193,7 @@ def RF_with_train_and_test_data(comb_df_train,comb_df_test,ensemble,minimum_trai
             r: The average Pearson correlation of determination over different models.
             r_err: The standard error for the average Pearson correlation of determination over different models.
             importances : The list of the importance of the traits in the model.
-    
+    model : sklearn.ensemble.RandomForestRegressor
     """
     if comb_df_train.shape[0]<minimum_train_data or comb_df_test.shape[0]<minimum_test_data or comb_df_train.shape[0]<comb_df_test.shape[0]: 
         print('The number of data points is less than miniumum!')
@@ -224,7 +225,7 @@ def RF_with_train_and_test_data(comb_df_train,comb_df_test,ensemble,minimum_trai
         imps_mean=np.mean(np.array(imps),axis=0)
         res={'R2': np.mean(r2s),'R2_err': stats.sem(r2s),'R2_adj': np.mean(r2_adjs),'R2_adj_err': stats.sem(r2_adjs) ,
              'r': np.mean(corrs),'r_err': stats.sem(corrs),'importances': imps_mean/np.sum(imps_mean)}
-    return res  
+    return res, model  
 
 
 def make_PFT_df(df,PFT):
@@ -343,11 +344,12 @@ def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_o
     -------
     res : dict 
         The resulting predictability scores and importance of the given traits.
+    model : sklearn.ensemble.RandomForestRegressor
     """   
     PFT_df = make_PFT_df(df_agg, PFT_of_interest)
     combination_df = make_combination_df(PFT_df, combination_of_interest)
-    train_res = RF_with_split(combination_df, ensemble_size, min_rows)
-    return train_res
+    train_res, model = RF_with_split(combination_df, ensemble_size, min_rows)
+    return train_res, model
 
 
 def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,ensemble_size,min_rows=50):    
@@ -384,7 +386,7 @@ def CV_with_PFT_of_interest(df_agg,PFT_of_interest,traits_list,ensemble_size,min
         combination_df = make_combination_df(PFT_df, list(traits))
         if combination_df.shape[0] < min_rows: continue 
         n_models += 1
-        train_res = RF_with_split(combination_df, ensemble_size, min_rows)   
+        train_res, _model = RF_with_split(combination_df, ensemble_size, min_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [combination_df.shape[0]] + [train_res[key] for key in headers[2:]]
 
     return table_df
@@ -417,16 +419,16 @@ def cross_prediction_global_PFT_with_combination_of_interest(df_agg,PFT_of_inter
     -------
     res : dict 
         The resulting predictability scores and Gini importance of the given traits.
+    model : sklearn.ensemble.RandomForestRegressor
     """
-    
     PFT_df_train = make_non_overlapping_PFT_df(df_agg,PFT_of_interest)
     PFT_df_test = make_PFT_df(df_agg,PFT_of_interest)
     
     combination_df_train=make_combination_df(PFT_df_train,combination_of_interest)
     combination_df_test=make_combination_df(PFT_df_test,combination_of_interest)
-    train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
-                                          minimum_train_rows,minimum_test_rows)   
-    return train_res
+    train_res, model = RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
+                                            minimum_train_rows,minimum_test_rows)   
+    return train_res, model
 
 
 def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
@@ -468,8 +470,8 @@ def cross_prediction_global_PFT(df_agg,PFT_of_interest,traits_list,
         if combination_df_train.shape[0]<minimum_train_rows or combination_df_test.shape[0]<minimum_test_rows:  continue
         if combination_df_train.shape[0]<combination_df_test.shape[0]:  continue
         n_models += 1
-        train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
-                                              minimum_train_rows,minimum_test_rows)   
+        train_res, _model = RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
+                                                        minimum_train_rows,minimum_test_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [[combination_df_train.shape[0],combination_df_test.shape[0]]]+ [train_res[key] for key in headers[2:]]
 
     return table_df
@@ -530,7 +532,7 @@ def available_PFT_pairs(df_agg,PFT_dict,traits_list,minimum_train_rows=40,minimu
 
 
 def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_test,combination_of_interest,
-                                            ensemble_size=50,minimum_train_rows=40,minimum_test_rows=10):    
+                                                          ensemble_size=50,minimum_train_rows=40,minimum_test_rows=10):    
     """ 
     To get the predictability scores and Gini importance of the traits for cross-prediction between two PFTs of interest,
     for the given combination of traits.
@@ -558,6 +560,7 @@ def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_t
     -------
     res : dict 
         The resulting predictability scores and Gini importance of the given traits.
+    model : sklearn.ensemble.RandomForestRegressor
     """
     
     PFT_df_train = make_PFT_df(df_agg,PFT_train)
@@ -565,9 +568,9 @@ def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_t
     
     combination_df_train=make_combination_df(PFT_df_train,combination_of_interest)
     combination_df_test=make_combination_df(PFT_df_test,combination_of_interest)
-    train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
-                                          minimum_train_rows,minimum_test_rows)    
-    return train_res
+    train_res, model = RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
+                                                   minimum_train_rows,minimum_test_rows)    
+    return train_res, model
 
 
 def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
@@ -611,8 +614,8 @@ def cross_prediction_PFT_PFT(df_agg,PFT_train,PFT_test,traits_list,
         if combination_df_train.shape[0]<minimum_train_rows or combination_df_test.shape[0]<minimum_test_rows:  continue
         if combination_df_train.shape[0]<combination_df_test.shape[0]:  continue
         n_models += 1
-        train_res=RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
-                                              minimum_train_rows,minimum_test_rows)   
+        train_res, _model = RF_with_train_and_test_data(combination_df_train,combination_df_test,ensemble_size,
+                                                        minimum_train_rows,minimum_test_rows)   
         table_df.loc[n_models-1] = [list(traits)] + [[combination_df_train.shape[0],combination_df_test.shape[0]]]+ [train_res[key] for key in headers[2:]]
 
     return table_df
