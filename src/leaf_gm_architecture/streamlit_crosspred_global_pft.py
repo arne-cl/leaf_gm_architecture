@@ -38,6 +38,11 @@ def app():
     if 'global_PFT_results' not in st.session_state:
         st.session_state.global_PFT_results = None
 
+    pft_group_options = list(gm.PFTs.keys())
+    selected_pft_group = st.selectbox(
+        'Select PFT Group',
+        options=pft_group_options,
+        index=pft_group_options.index('ferns'))
     selected_traits = st.multiselect(
         'Select traits', 
         ['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
@@ -50,7 +55,7 @@ def app():
     if st.button('Calculate Cross Prediction: global-PFT'):
         global_PFT_results = get_global_PFT_results(
             df_agg=st.session_state['aggregated_df'],
-            PFT_of_interest=['ferns'],
+            PFT_of_interest=gm.PFTs[selected_pft_group],
             traits_list=selected_traits, 
             ensemble_size=ensemble_size,
             min_train_rows=min_train_rows, 
@@ -90,7 +95,7 @@ def app():
             if selected_traits_detailed_analysis:
                 global_PFT_comb_interest_results, model = get_global_PFT_comb_interest_results(
                     df_agg=st.session_state['aggregated_df'],
-                    PFT_of_interest=['ferns'],
+                    PFT_of_interest=gm.PFTs[selected_pft_group],
                     combination_of_interest=selected_traits_detailed_analysis, 
                     ensemble_size=ensemble_size,
                     min_train_rows=min_train_rows, 
