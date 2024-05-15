@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 import leaf_gm_architecture.functions as gm
-from leaf_gm_architecture.streamlit_utils import dict_to_tables
+from leaf_gm_architecture.streamlit_utils import dict_to_tables, PageNames
 
 
 def app():
@@ -44,3 +44,16 @@ def app():
         # show importances table
         st.subheader('Gini importances')
         st.dataframe(importances_df)
+
+        # User input for prediction
+        st.subheader('Predict gm value')
+        inputs = {}
+        for trait in selected_traits:
+            min_val = st.session_state['global_df'][trait].min()
+            max_val = st.session_state['global_df'][trait].max()
+            inputs[trait] = st.number_input(f'Insert {trait} (range: {min_val} to {max_val})', min_value=float(min_val), max_value=float(max_val))
+
+        if st.button('Predict gm'):
+            X = np.array(list(inputs.values())).reshape(1, -1)
+            gm_val = model.predict(X)[0]
+            st.write(f'Predicted gm value: {np.round(gm_val, 3)}')

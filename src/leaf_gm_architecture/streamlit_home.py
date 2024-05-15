@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 
 import leaf_gm_architecture
-from leaf_gm_architecture.streamlit_utils import load_data, PageNames
+from leaf_gm_architecture.streamlit_utils import load_dataset, load_aggregated_data, PageNames
 from leaf_gm_architecture import streamlit_crossval, streamlit_crosspred_global_pft
 
 
@@ -16,9 +16,14 @@ selected = option_menu(
     orientation="horizontal",
 )
 
+
+# initialize session state for raw dataset
+if 'global_df' not in st.session_state:
+    st.session_state['global_df'] = load_dataset()
+
 # initialize session state for aggregated data
 if 'aggregated_df' not in st.session_state:
-    st.session_state['aggregated_df'] = load_data()
+    st.session_state['aggregated_df'] = load_aggregated_data()
 
 if selected == PageNames.ABOUT.value:
     st.title('leaf_gm_architecture')

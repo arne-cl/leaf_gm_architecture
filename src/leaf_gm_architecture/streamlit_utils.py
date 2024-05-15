@@ -12,9 +12,11 @@ class PageNames(Enum):
     CROSSPRED_GLOBAL_PFT = "Cross Prediction: global-PFT"
     CROSSPRED_PFT_PFT = "Cross Prediction: PFT-PFT"
 
+def load_dataset():
+    return pd.read_excel('gm_dataset_Knauer_et_al_2022.xlsx', sheet_name='data')
 
 @st.cache_data  # this caches the aggregated input data between runs
-def load_data():
+def load_aggregated_data():
     return pd.read_parquet('gm_dataset_Knauer_et_al_2022_aggregated.parquet')
 
 
