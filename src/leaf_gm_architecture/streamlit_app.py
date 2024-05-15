@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-import Leaf_gm_architecture_functions as gm
+import leaf_gm_architecture.functions as gm
 
 
 @st.cache_data  # this caches the aggregated input data between runs

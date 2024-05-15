@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd
 
-import Leaf_gm_architecture_functions as gm
+import leaf_gm_architecture.functions as gm
+
 
 def check_dicts_almost_equal(expected_dict, actual_dict, atol=1e-1):
     for key, expected in expected_dict.items():

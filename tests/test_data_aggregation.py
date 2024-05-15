@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import pytest
 
-from Leaf_gm_architecture_functions import data_aggregation
+from leaf_gm_architecture.functions import data_aggregation
 
 
 def test_data_aggregation():
