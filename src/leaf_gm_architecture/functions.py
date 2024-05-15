@@ -129,7 +129,7 @@ def RF_with_split(comb_df, ensemble, minimum_data):
             r: The average Pearson correlation of determination over different models.
             r_err: The standard error for the average Pearson correlation of determination over different models.
             importances : The list of the importance of the traits in the model.
-    model : TODO add return type
+    model : sklearn.ensemble.RandomForestRegressor
     """
     if comb_df.shape[0] < minimum_data:
         print(f'The number of data points ({comb_df.shape[0]}) is less than the minimum required ({minimum_data})!')
@@ -193,7 +193,7 @@ def RF_with_train_and_test_data(comb_df_train,comb_df_test,ensemble,minimum_trai
             r: The average Pearson correlation of determination over different models.
             r_err: The standard error for the average Pearson correlation of determination over different models.
             importances : The list of the importance of the traits in the model.
-    model : TODO add return type
+    model : sklearn.ensemble.RandomForestRegressor
     """
     if comb_df_train.shape[0]<minimum_train_data or comb_df_test.shape[0]<minimum_test_data or comb_df_train.shape[0]<comb_df_test.shape[0]: 
         print('The number of data points is less than miniumum!')
@@ -344,7 +344,7 @@ def CV_with_PFT_and_combination_of_interest(df_agg,PFT_of_interest,combination_o
     -------
     res : dict 
         The resulting predictability scores and importance of the given traits.
-    model : TODO add return type
+    model : sklearn.ensemble.RandomForestRegressor
     """   
     PFT_df = make_PFT_df(df_agg, PFT_of_interest)
     combination_df = make_combination_df(PFT_df, combination_of_interest)
@@ -419,7 +419,7 @@ def cross_prediction_global_PFT_with_combination_of_interest(df_agg,PFT_of_inter
     -------
     res : dict 
         The resulting predictability scores and Gini importance of the given traits.
-    model: TODO add return type
+    model : sklearn.ensemble.RandomForestRegressor
     """
     PFT_df_train = make_non_overlapping_PFT_df(df_agg,PFT_of_interest)
     PFT_df_test = make_PFT_df(df_agg,PFT_of_interest)
@@ -560,7 +560,7 @@ def cross_prediction_PFT_PFT_with_combination_of_interest(df_agg,PFT_train,PFT_t
     -------
     res : dict 
         The resulting predictability scores and Gini importance of the given traits.
-    model : TODO add return type
+    model : sklearn.ensemble.RandomForestRegressor
     """
     
     PFT_df_train = make_PFT_df(df_agg,PFT_train)
