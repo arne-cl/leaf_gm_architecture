@@ -33,7 +33,7 @@ def test_example_run1():
         'importances': np.array([0.62323259, 0.15238046, 0.13257167, 0.09181528])
     }
 
-    actual_results = gm.CV_with_PFT_and_combination_of_interest(
+    actual_results, _model = gm.CV_with_PFT_and_combination_of_interest(
         aggregated_df,
         gm.PFTs['global_set'],
         traits,
