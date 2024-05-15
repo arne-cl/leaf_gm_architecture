@@ -32,9 +32,11 @@ def get_global_PFT_comb_interest_results(df_agg, PFT_of_interest, combination_of
 def app():
     st.header(PageNames.CROSSPRED_GLOBAL_PFT.value)
     
-    # Initialize session state for `selected_traits_detailed_analysis` if it doesn't exist
+    # Initialize session state if it doesn't exist
     if 'selected_traits_detailed_analysis' not in st.session_state:
         st.session_state.selected_traits_detailed_analysis = []
+    if 'global_PFT_results' not in st.session_state:
+        st.session_state.global_PFT_results = None
 
     # Debug output
     st.write("Session State at Start:", st.session_state)
@@ -57,7 +59,14 @@ def app():
             min_train_rows=min_train_rows, 
             min_test_rows=min_test_rows
         )
+        
+        # Store the results in session state
+        st.session_state.global_PFT_results = global_PFT_results
 
+    # Check if we have results in session state
+    if st.session_state.global_PFT_results is not None:
+        global_PFT_results = st.session_state.global_PFT_results
+        
         if global_PFT_results.shape[0] > 0:
             st.write("Trained models:", global_PFT_results.shape[0])
             st.write(global_PFT_results)
@@ -82,7 +91,7 @@ def app():
             st.session_state.selected_traits_detailed_analysis = selected_traits_detailed_analysis
 
             # Debug output
-            st.write("Session State after selection:", st.session_state)
+            st.write("Session State after selection:", [(k,v) for k,v in st.session_state.items() if k != 'aggregated_df'])
 
             if selected_traits_detailed_analysis:
                 global_PFT_comb_interest_results = get_global_PFT_comb_interest_results(
