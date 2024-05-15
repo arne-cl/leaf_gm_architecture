@@ -34,8 +34,10 @@ def app():
     
     # Initialize session state for `selected_traits_detailed_analysis` if it doesn't exist
     if 'selected_traits_detailed_analysis' not in st.session_state:
-        print(f"selected_traits_detailed_analysis is empty!")
         st.session_state.selected_traits_detailed_analysis = []
+
+    # Debug output
+    st.write("Session State at Start:", st.session_state)
 
     selected_traits = st.multiselect(
         'Select traits', 
@@ -78,6 +80,9 @@ def app():
 
             # Update session state with the current selection
             st.session_state.selected_traits_detailed_analysis = selected_traits_detailed_analysis
+
+            # Debug output
+            st.write("Session State after selection:", st.session_state)
 
             if selected_traits_detailed_analysis:
                 global_PFT_comb_interest_results = get_global_PFT_comb_interest_results(
