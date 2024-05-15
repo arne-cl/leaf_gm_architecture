@@ -10,7 +10,7 @@ authors = ["Milad Rahimi Majd <milad.rahimi.majd@uni-potsdam.de>"]
 maintainers = ["Arne Neumann <leaf_gm_architecture.programming@arne.cl>"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.12"
 pandas = "1.5.3"
 numpy = "1.24.3"
 scikit-learn = "1.2.2"
