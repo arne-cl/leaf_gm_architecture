@@ -199,6 +199,7 @@ def RF_with_train_and_test_data(comb_df_train,comb_df_test,ensemble,minimum_trai
         print('The number of data points is less than miniumum!')
         res={'R2': np.nan,'R2_err': np.nan,'R2_adj': np.nan,'R2_adj_err': np.nan,
              'r': np.nan,'r_err': np.nan,'importances': np.nan}
+        model = None
     else:
         X_train= np.array(comb_df_train.values)[:,1:] 
         y_train= np.array(comb_df_train.values)[:,0] 

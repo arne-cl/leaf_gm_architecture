@@ -3,7 +3,10 @@ from streamlit_option_menu import option_menu
 
 import leaf_gm_architecture
 from leaf_gm_architecture.streamlit_utils import load_dataset, load_aggregated_data, PageNames
-from leaf_gm_architecture import streamlit_crossval, streamlit_crosspred_global_pft
+from leaf_gm_architecture import (
+    streamlit_crossval,
+    streamlit_crosspred_global_pft,
+    streamlit_crosspred_pft_pft)
 
 
 
@@ -34,3 +37,6 @@ if selected == PageNames.CROSSVAL.value:
 
 if selected == PageNames.CROSSPRED_GLOBAL_PFT.value:
     streamlit_crosspred_global_pft.app()
+
+if selected == PageNames.CROSSPRED_PFT_PFT.value:
+    streamlit_crosspred_pft_pft.app()
