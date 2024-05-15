@@ -38,9 +38,6 @@ def app():
     if 'global_PFT_results' not in st.session_state:
         st.session_state.global_PFT_results = None
 
-    # Debug output
-    st.write("Session State at Start:", st.session_state)
-
     selected_traits = st.multiselect(
         'Select traits', 
         ['LMA', 'T_mesophyll', 'fias_mesophyll', 'T_cw', 'T_cyt', 'T_chloroplast', 'Sm', 'Sc', 'T_leaf', 'D_leaf'],
@@ -90,11 +87,8 @@ def app():
             # Update session state with the current selection
             st.session_state.selected_traits_detailed_analysis = selected_traits_detailed_analysis
 
-            # Debug output
-            st.write("Session State after selection:", [(k,v) for k,v in st.session_state.items() if k != 'aggregated_df'])
-
             if selected_traits_detailed_analysis:
-                global_PFT_comb_interest_results = get_global_PFT_comb_interest_results(
+                global_PFT_comb_interest_results, model = get_global_PFT_comb_interest_results(
                     df_agg=st.session_state['aggregated_df'],
                     PFT_of_interest=['ferns'],
                     combination_of_interest=selected_traits_detailed_analysis, 
@@ -104,7 +98,16 @@ def app():
                 )
 
                 st.header(PageNames.CROSSPRED_GLOBAL_PFT.value + " (with combination of interest)")
-                st.write(global_PFT_comb_interest_results)
+                
+                predictability_scores_df, importances_df = dict_to_tables(global_PFT_comb_interest_results)
+
+                # show predictability scores table
+                st.subheader('Predictability scores')
+                st.dataframe(predictability_scores_df)
+
+                # show importances table
+                st.subheader('Gini importances')
+                st.dataframe(importances_df)                
             else:
                 st.error("Please select at least one trait to perform a detailed analysis.")
         else:
