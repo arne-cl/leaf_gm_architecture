@@ -65,7 +65,7 @@ For example, to get the predictability scores and Gini importance of the traits 
 
 ```
 import pandas as pd
-import Leaf_gm_architecture_functions as gm
+import leaf_gm_architecture.functions as gm
 
 global_df = pd.read_excel('gm_dataset_Knauer_et_al_2022.xlsx', sheet_name='data')
 aggregated_df = gm.data_aggregation(global_df)
@@ -85,7 +85,7 @@ As another example, to obtain the predictability scores and total importance of 
 
 ```
 import pandas as pd
-import Leaf_gm_architecture_functions as gm
+import leaf_gm_architecture.functions as gm
 
 global_df = pd.read_excel('gm_dataset_Knauer_et_al_2022.xlsx', sheet_name='data')
 aggregated_df = gm.data_aggregation(global_df)
