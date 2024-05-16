@@ -8,6 +8,14 @@ We recommended to install the software in a virtual environment,
 e.g. [using Python's venv module](https://realpython.com/python-virtual-environments-a-primer/)
 or [using conda](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html).
 
+After installation, the code can be used as shown below. Additionally,
+we provide a basic web application that showcases the main functionality.
+It can be started this way:
+
+```
+streamlit run src/leaf_gm_architecture/streamlit_app.py 
+```
+
 A copy of the dataset (Knauer et al. 2002, https://doi.org/10.6084/m9.figshare.19681410.v1 )
 has been included in the files (gm_dataset_Knauer_et_al_2022.xlsx). 
 

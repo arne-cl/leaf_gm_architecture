@@ -32,7 +32,7 @@ def get_global_PFT_comb_interest_results(df_agg, PFT_of_interest, combination_of
 def app():
     st.header(PageNames.CROSSPRED_GLOBAL_PFT.value)
     
-    # Initialize session state if it doesn't exist
+    # initialize session state if it doesn't exist
     if 'selected_traits_detailed_analysis' not in st.session_state:
         st.session_state.selected_traits_detailed_analysis = []
     if 'global_PFT_results' not in st.session_state:
@@ -62,10 +62,10 @@ def app():
             min_test_rows=min_test_rows
         )
         
-        # Store the results in session state
+        # store results in session state
         st.session_state.global_PFT_results = global_PFT_results
 
-    # Check if we have results in session state
+    # check if we have results in session state
     if st.session_state.global_PFT_results is not None:
         global_PFT_results = st.session_state.global_PFT_results
         
@@ -76,20 +76,20 @@ def app():
             st.write("The IMP_G of the contributing traits in the trained models:", average_imps_g)
             st.write("The IMP_C of the contributing traits in the trained models:", average_values_c)
 
-            # Extract unique traits from global_PFT_results
+            # extract unique traits from global_PFT_results
             trait_options = set()
             for traits_list in global_PFT_results['Traits']:
                 trait_options.update(traits_list)
             trait_options = sorted(trait_options)
 
-            # Let user select combination of traits from the extracted options
+            # let user select combination of traits from extracted options
             selected_traits_detailed_analysis = st.multiselect(
                 'Select combination of traits for detailed analysis',
                 options=trait_options,
                 default=st.session_state.selected_traits_detailed_analysis
             )
 
-            # Update session state with the current selection
+            # update session state with current selection
             st.session_state.selected_traits_detailed_analysis = selected_traits_detailed_analysis
 
             if selected_traits_detailed_analysis:
@@ -103,14 +103,11 @@ def app():
                 )
 
                 st.header(PageNames.CROSSPRED_GLOBAL_PFT.value + " (with combination of interest)")
-                
                 predictability_scores_df, importances_df = dict_to_tables(global_PFT_comb_interest_results)
 
-                # show predictability scores table
                 st.subheader('Predictability scores')
                 st.dataframe(predictability_scores_df)
 
-                # show importances table
                 st.subheader('Gini importances')
                 st.dataframe(importances_df)                
             else:

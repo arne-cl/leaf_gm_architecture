@@ -42,14 +42,12 @@ def app():
         results, model = gm.CV_with_PFT_and_combination_of_interest(st.session_state['aggregated_df'], gm.PFTs[selected_pft_group], selected_traits, ensemble_size=ensemble_size, min_rows=min_rows)
         predictability_scores_df, importances_df = dict_to_tables(results)
 
-        # store the model in the session state
+        # store model in session state
         st.session_state['model'] = model
 
-        # show predictability scores table
         st.subheader('Predictability scores')
         st.dataframe(predictability_scores_df)
 
-        # show importances table
         st.subheader('Gini importances')
         st.dataframe(importances_df)
 

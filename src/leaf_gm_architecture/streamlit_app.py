@@ -24,7 +24,6 @@ def main():
         orientation="horizontal",
     )
 
-
     # initialize session state for raw dataset
     if 'global_df' not in st.session_state:
         st.session_state['global_df'] = load_dataset()
